@@ -1,104 +1,125 @@
 const express = require("express");
-const app = express();
+const { MongoClient, ObjectId } = require("mongodb");
 
-// Indica para o Express que estamos utilizando JSON na requisições
-app.use(express.json());
+const url = "mongodb://localhost:27017";
+const dbName = "ocean_bancodedados_13_05_2022";
 
-// Criação do endpoint principal
-app.get("/", function (req, res) {
-  res.send("Hello World");
-});
+async function main() {
+  console.log("Conectando com o banco de dados...");
 
-// Heróis e Heroínas
+  const client = await MongoClient.connect(url);
 
-const herois = ["Mulher Maravilha", "Capitã Marvel", "Homem de Ferro"];
-//               0                    1               2
+  const db = client.db(dbName);
 
-// Read All (Ler todos os itens)
-app.get("/herois", function (req, res) {
-  res.send(herois.filter(Boolean));
-});
+  const collection = db.collection("herois");
 
-// Read by ID (Visualizar um item pelo ID)
-app.get("/herois/:id", function (req, res) {
-  // Recebemos o ID que iremos buscar
-  const id = req.params.id;
+  console.log("Conexão com o banco de dados realizada com sucesso.");
 
-  // Buscamos o item dentro da lista, utilizando o ID
-  const item = herois[id - 1];
+  const app = express();
 
-  if (!item) {
-    // Envia uma resposta de não encontrado
-    res.status(404).send("Item não encontrado.");
+  // Indica para o Express que estamos utilizando JSON na requisições
+  app.use(express.json());
 
-    // Encerra a função
-    return;
-  }
+  // Criação do endpoint principal
+  app.get("/", function (req, res) {
+    res.send("Hello World");
+  });
 
-  res.send(item);
-});
+  // Heróis e Heroínas
 
-// Create (Criar um item)
-app.post("/herois", function (req, res) {
-  // Obtemos o nome que foi enviado no body da requisição
-  const item = req.body.nome;
+  const herois = ["Mulher Maravilha", "Capitã Marvel", "Homem de Ferro"];
+  //               0                    1               2
 
-  if (!item) {
-    res
-      .status(400)
-      .send("Você deve informar a propriedade 'nome' no corpo da requisição.");
+  // Read All (Ler todos os itens)
+  app.get("/herois", function (req, res) {
+    res.send(herois.filter(Boolean));
+  });
 
-    // Encerra a função
-    return;
-  }
+  // Read by ID (Visualizar um item pelo ID)
+  app.get("/herois/:id", function (req, res) {
+    // Recebemos o ID que iremos buscar
+    const id = req.params.id;
 
-  // Adicionamos esse item obtido dentro da lista de heróis
-  herois.push(item);
+    // Buscamos o item dentro da lista, utilizando o ID
+    const item = herois[id - 1];
 
-  res.send("Item criado com sucesso!");
-});
+    if (!item) {
+      // Envia uma resposta de não encontrado
+      res.status(404).send("Item não encontrado.");
 
-// Update (Editar um item)
-app.put("/herois/:id", function (req, res) {
-  // Obtemos o ID do item a ser atualizado
-  const id = req.params.id;
+      // Encerra a função
+      return;
+    }
 
-  if (!herois[id - 1]) {
-    // Envia uma resposta de não encontrado
-    res.status(404).send("Item não encontrado.");
+    res.send(item);
+  });
 
-    // Encerra a função
-    return;
-  }
+  // Create (Criar um item)
+  app.post("/herois", function (req, res) {
+    // Obtemos o nome que foi enviado no body da requisição
+    const item = req.body.nome;
 
-  // Pegamos a nova informação que está sendo enviada
-  const item = req.body;
+    if (!item) {
+      res
+        .status(400)
+        .send(
+          "Você deve informar a propriedade 'nome' no corpo da requisição."
+        );
 
-  // Atualizamos a informação na lista
-  herois[id - 1] = item;
+      // Encerra a função
+      return;
+    }
 
-  res.send("Item editado com sucesso!");
-});
+    // Adicionamos esse item obtido dentro da lista de heróis
+    herois.push(item);
 
-// Delete (Remover um item)
-app.delete("/herois/:id", function (req, res) {
-  // Obtemos o ID do registro que será excluído
-  const id = req.params.id;
+    res.send("Item criado com sucesso!");
+  });
 
-  if (!herois[id - 1]) {
-    // Envia uma resposta de não encontrado
-    res.status(404).send("Item não encontrado.");
+  // Update (Editar um item)
+  app.put("/herois/:id", function (req, res) {
+    // Obtemos o ID do item a ser atualizado
+    const id = req.params.id;
 
-    // Encerra a função
-    return;
-  }
+    if (!herois[id - 1]) {
+      // Envia uma resposta de não encontrado
+      res.status(404).send("Item não encontrado.");
 
-  // Removemos o item da lista
-  delete herois[id - 1];
+      // Encerra a função
+      return;
+    }
 
-  res.send("Item removido com sucesso!");
-});
+    // Pegamos a nova informação que está sendo enviada
+    const item = req.body;
 
-app.listen(3000, () =>
-  console.log("Aplicação rodando em http://localhost:3000")
-);
+    // Atualizamos a informação na lista
+    herois[id - 1] = item;
+
+    res.send("Item editado com sucesso!");
+  });
+
+  // Delete (Remover um item)
+  app.delete("/herois/:id", function (req, res) {
+    // Obtemos o ID do registro que será excluído
+    const id = req.params.id;
+
+    if (!herois[id - 1]) {
+      // Envia uma resposta de não encontrado
+      res.status(404).send("Item não encontrado.");
+
+      // Encerra a função
+      return;
+    }
+
+    // Removemos o item da lista
+    delete herois[id - 1];
+
+    res.send("Item removido com sucesso!");
+  });
+
+  app.listen(3000, () =>
+    console.log("Aplicação rodando em http://localhost:3000")
+  );
+}
+
+main();
