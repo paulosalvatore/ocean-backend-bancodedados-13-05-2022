@@ -57,9 +57,9 @@ async function main() {
   });
 
   // Create (Criar um item)
-  app.post("/herois", function (req, res) {
+  app.post("/herois", async function (req, res) {
     // Obtemos o nome que foi enviado no body da requisição
-    const item = req.body.nome;
+    const item = req.body;
 
     if (!item) {
       res
@@ -73,9 +73,9 @@ async function main() {
     }
 
     // Adicionamos esse item obtido dentro da lista de heróis
-    herois.push(item);
+    await collection.insertOne(item);
 
-    res.send("Item criado com sucesso!");
+    res.send(item);
   });
 
   // Update (Editar um item)
