@@ -31,8 +31,10 @@ async function main() {
   //               0                    1               2
 
   // Read All (Ler todos os itens)
-  app.get("/herois", function (req, res) {
-    res.send(herois.filter(Boolean));
+  app.get("/herois", async function (req, res) {
+    const documentos = await collection.find().toArray();
+
+    res.send(documentos);
   });
 
   // Read by ID (Visualizar um item pelo ID)
