@@ -108,11 +108,13 @@ async function main() {
   });
 
   // Delete (Remover um item)
-  app.delete("/herois/:id", function (req, res) {
+  app.delete("/herois/:id", async function (req, res) {
     // Obtemos o ID do registro que será excluído
     const id = req.params.id;
 
-    if (!herois[id - 1]) {
+    const itemEncontrado = await collection.findOne({ _id: new ObjectId(id) });
+
+    if (!itemEncontrado) {
       // Envia uma resposta de não encontrado
       res.status(404).send("Item não encontrado.");
 
@@ -120,8 +122,8 @@ async function main() {
       return;
     }
 
-    // Removemos o item da lista
-    delete herois[id - 1];
+    // Removemos o item do DB
+    await collection.deleteOne({ _id: new ObjectId(id) });
 
     res.send("Item removido com sucesso!");
   });
