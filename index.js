@@ -38,12 +38,12 @@ async function main() {
   });
 
   // Read by ID (Visualizar um item pelo ID)
-  app.get("/herois/:id", function (req, res) {
+  app.get("/herois/:id", async function (req, res) {
     // Recebemos o ID que iremos buscar
     const id = req.params.id;
 
     // Buscamos o item dentro da lista, utilizando o ID
-    const item = herois[id - 1];
+    const item = await collection.findOne({ _id: new ObjectId(id) });
 
     if (!item) {
       // Envia uma resposta de não encontrado
