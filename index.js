@@ -79,11 +79,13 @@ async function main() {
   });
 
   // Update (Editar um item)
-  app.put("/herois/:id", function (req, res) {
+  app.put("/herois/:id", async function (req, res) {
     // Obtemos o ID do item a ser atualizado
     const id = req.params.id;
 
-    if (!herois[id - 1]) {
+    const itemEncontrado = await collection.findOne({ _id: new ObjectId(id) });
+
+    if (!itemEncontrado) {
       // Envia uma resposta de não encontrado
       res.status(404).send("Item não encontrado.");
 
@@ -94,10 +96,15 @@ async function main() {
     // Pegamos a nova informação que está sendo enviada
     const item = req.body;
 
-    // Atualizamos a informação na lista
-    herois[id - 1] = item;
+    // Atualizamos a informação no DB
+    await collection.updateOne(
+      { _id: new ObjectId(id) },
+      {
+        $set: item,
+      }
+    );
 
-    res.send("Item editado com sucesso!");
+    res.send(item);
   });
 
   // Delete (Remover um item)
